@@ -65,4 +65,9 @@
     <Publicize Include="Assembly-CSharp"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="triggeredidiot\assets.bundle" />
+    <EmbeddedResource Include="triggeredidiot\assets.bundle" />
+  </ItemGroup>
+
 </Project>
