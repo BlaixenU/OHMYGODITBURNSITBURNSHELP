@@ -145,14 +145,17 @@ public class ItemModMain
 
     public static void createOsakaSign()
     {
-        GameObject osakaSignInstance = GameObject.Instantiate(osakaSignObject);
-        Vector3 targetLocation = GameObject.FindAnyObjectByType<FirstRoomPrefab>().transform.position;
-        Quaternion targetRotation = GameObject.FindAnyObjectByType<FirstRoomPrefab>().transform.rotation;
-        //LogHelper.LogInfo("target location: " + targetLocation.ToString());
-        osakaSignInstance.transform.position = targetLocation;
-        osakaSignInstance.transform.rotation = targetRotation;
-        osakaSignInstance.transform.Rotate(0, 90, 0);
-        osakaSignInstance.transform.Translate(45, 2, -14f);
+        if (GameObject.FindAnyObjectByType<FirstRoomPrefab>() != null)
+        {
+            GameObject osakaSignInstance = GameObject.Instantiate(osakaSignObject);
+            Vector3 targetLocation = GameObject.FindAnyObjectByType<FirstRoomPrefab>().transform.position;
+            Quaternion targetRotation = GameObject.FindAnyObjectByType<FirstRoomPrefab>().transform.rotation;
+            //LogHelper.LogInfo("target location: " + targetLocation.ToString());
+            osakaSignInstance.transform.position = targetLocation;
+            osakaSignInstance.transform.rotation = targetRotation;
+            osakaSignInstance.transform.Rotate(0, 90, 0);
+            osakaSignInstance.transform.Translate(45, 2, -14f);
+        }
     }
 
     public static void InitialAssignPower()
