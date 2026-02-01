@@ -20,10 +20,8 @@ using UnityEngine.SceneManagement;
  * Please find it in your heart to forgive me.
 */
 
-namespace itemMod
+namespace ItemMod
 {
-    
-
     [EntryPoint]
     public class ItemModMain
     {
@@ -48,6 +46,7 @@ namespace itemMod
         public static GameObject iglooObject;
         public static GameObject orbitObject;
         public static GameObject donutObject;
+        public static GameObject osakaSignObject;
 
         /*
          * Todo:
@@ -73,55 +72,74 @@ namespace itemMod
 
         public static void LoadBundle()
         {
-            canUseItem = false;
-            // load bundle, find the item canvas
-            packedObjects = bundle.LoadAllAssets<GameObject>();
-            foreach (GameObject gameObject in packedObjects)
+            if(SceneHelper.CurrentScene != "Bootstrap" && SceneHelper.CurrentScene != "Main Menu" && SceneHelper.CurrentScene != "Intro")
             {
-                // grabs the name of the specific item I WANT IT!!!!!!!!!!!
-                //LogHelper.LogInfo($"{gameObject.name}");
-                if ($"{gameObject.name}" == "Item Canvas")
+                canUseItem = false;
+                // load bundle, find the item canvas
+                packedObjects = bundle.LoadAllAssets<GameObject>();
+                foreach (GameObject gameObject in packedObjects)
                 {
-                    itemCanvas = GameObject.Instantiate(gameObject, new Vector3(0, 0, 0), Quaternion.identity);
+                    // grabs the name of the specific item I WANT IT!!!!!!!!!!!
+                    //LogHelper.LogInfo($"{gameObject.name}");
+                    if ($"{gameObject.name}" == "Item Canvas")
+                    {
+                        itemCanvas = GameObject.Instantiate(gameObject, new Vector3(0, 0, 0), Quaternion.identity);
+                    }
+                    if ($"{gameObject.name}" == "igloo")
+                    {
+                        iglooObject = gameObject;
+                    }
+                    if ($"{gameObject.name}" == "orbit")
+                    {
+                        orbitObject = gameObject;
+                    }
+                    if ($"{gameObject.name}" == "donut")
+                    {
+                        donutObject = gameObject;
+                    }
+                    if ($"{gameObject.name}" == "osakasign")
+                    {
+                        osakaSignObject = gameObject;
+                    }
+                    else
+                    {
+                        LogHelper.LogError("bundle error: item canvas name was not identified.");
+                    }
+                    LogHelper.LogInfo($"{gameObject.name}");
                 }
-                if ($"{gameObject.name}" == "igloo")
+                // gets the item box sprite
+                itemBox = GameObject.Find(itemCanvas.name + "/Item Box");
+                refillSfx = GameObject.Find(itemCanvas.name + "/refill sfx");
+                useSfx = GameObject.Find(itemCanvas.name + "/use sfx");
+
+                // determine whether to reposition the item box (broken in frankentoilet, thanks guys)
+                if (PrefsManager.Instance.GetInt("weaponHoldPosition") == 2)
                 {
-                    iglooObject = gameObject;
-                }
-                if ($"{gameObject.name}" == "orbit")
-                {
-                    orbitObject = gameObject;
-                }
-                if ($"{gameObject.name}" == "donut")
-                {
-                    donutObject = gameObject;
+                    LogHelper.LogInfo("2");
+                    itemBox.transform.localPosition = new Vector3(-800, -380);
                 }
                 else
                 {
-                    LogHelper.LogError("bundle error: item canvas name was not identified.");
+                    itemBox.transform.localPosition = new Vector3(800, -380);
                 }
-                LogHelper.LogInfo($"{gameObject.name}");
-            }
-            // gets the item box sprite
-            itemBox = GameObject.Find(itemCanvas.name + "/Item Box");
-            refillSfx = GameObject.Find(itemCanvas.name + "/refill sfx");
-            useSfx = GameObject.Find(itemCanvas.name + "/use sfx");
+                itemBox.AddComponent<ItemModUpdates>();
 
-            // determine whether to reposition the item box (broken in frankentoilet, thanks guys)
-            if (PrefsManager.Instance.GetInt("weaponHoldPosition") == 2)
-            {
-                LogHelper.LogInfo("2");
-                itemBox.transform.localPosition = new Vector3(-800, -380);
+                createOsakaSign();
+                InitialAssignPower();
+                RandomizePower();
             }
-            else
-            {
-                itemBox.transform.localPosition = new Vector3(800, -380);
-            }
-            itemBox.AddComponent<ItemModUpdates>();
+        }
 
-
-            InitialAssignPower();
-            RandomizePower(); 
+        public static void createOsakaSign()
+        {
+            GameObject osakaSignInstance = GameObject.Instantiate(osakaSignObject);
+            Vector3 targetLocation = GameObject.FindAnyObjectByType<FirstRoomPrefab>().transform.position;
+            Quaternion targetRotation = GameObject.FindAnyObjectByType<FirstRoomPrefab>().transform.rotation;
+            LogHelper.LogInfo("target location: " + targetLocation.ToString());
+            osakaSignInstance.transform.position = targetLocation;
+            osakaSignInstance.transform.rotation = targetRotation;
+            osakaSignInstance.transform.Rotate(0, 90, 0);
+            osakaSignInstance.transform.Translate(45, 2, -14f);
         }
 
         public static void InitialAssignPower()
@@ -206,6 +224,7 @@ namespace itemMod
                 exploder.transform.SetPositionAndRotation(NewMovement.Instance.transform.position, new Quaternion(0f, 0f, 0f, 0f));
                 exploder.transform.Find("Sphere_8").GetComponent<Explosion>().maxSize = 100;
                 exploder.transform.Find("Sphere_8").GetComponent<Explosion>().speed = 15;
+                exploder.transform.Find("Sphere_8").GetComponent<Explosion>().playerDamageOverride = 1;
                 exploder.transform.localScale = new Vector3(3f, 3f, 3f);
                 GameObject.Instantiate(exploder);
             }
@@ -303,7 +322,7 @@ namespace itemMod
     {
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Z) && ItemModMain.canUseItem == true)
+            if (Input.GetKeyDown(KeyCode.C) && ItemModMain.canUseItem == true && SceneHelper.CurrentScene != "Bootstrap" && SceneHelper.CurrentScene != "Main Menu" && SceneHelper.CurrentScene != "Intro")
             {
                 LogHelper.LogInfo("using power.");
                 ItemModMain.usePower();
@@ -314,7 +333,7 @@ namespace itemMod
         public static IEnumerator Cooldown()
         {
             ItemModMain.canUseItem = false;
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(10);
             ItemModMain.RandomizePower();
             // play the refill sound effect
             ItemModMain.refillSfx.GetComponent<AudioSource>().Play();
