@@ -29,7 +29,7 @@ public static class EntryPoint
     [EntryPoint]
     public static void Start()
     {
-        LogError("Loading");
+        LogInfo("Loading");
 
         LoadSoundAndMusicAddressables();
 
@@ -82,10 +82,6 @@ public static class EntryPoint
             if (files.Length > 0)
             {
                 LogInfo($"Found {files.Length} 'catalog.json' file(s):");
-                foreach (string file in files)
-                {
-                    LogInfo(file);
-                }
                 return files;
             }
             else
