@@ -1,4 +1,5 @@
-﻿using FrankenToilet.Core;
+﻿using FrankenToilet.Bryan.Patches;
+using FrankenToilet.Core;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -32,6 +33,9 @@ public static class Popups
         PopupCloser.Instance.Awake();
 
         MainPrefab = AssetsController.LoadAsset<GameObject>("assets/aizoaizo/popup.prefab");
+        GameObject videoPlayer = MainPrefab.GetComponentInChildren<VideoPlayer>().gameObject;
+        videoPlayer.AddComponent<NonReplaceableVideo>();
+
         MainPrefab.SetActive(false);
 
         BaseRenderTexture = AssetsController.LoadAsset<RenderTexture>("assets/aizoaizo/videotexture.rendertexture");
