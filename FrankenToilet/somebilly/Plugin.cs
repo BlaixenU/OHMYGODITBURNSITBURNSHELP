@@ -12,6 +12,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using UnityEngine.Video;
 using TMPro;
 using System;
 using System.Linq;
@@ -21,10 +22,6 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-/*
-TODO:
-1. 2
-*/
 
 namespace FrankenToilet.somebilly {
     [EntryPoint]
@@ -83,7 +80,7 @@ namespace FrankenToilet.somebilly {
             lineDate = new GameObject("LineDate");
             lineDate.transform.SetParent(layout.transform);
             GoodSwayer lineDateSwayer = lineDate.AddComponent<GoodSwayer>();
-            lineDateSwayer.speed = UnityEngine.Random.Range(1.75f, 4f);
+            lineDateSwayer.speed = 0.5f * UnityEngine.Random.Range(2, 10);
             textDate = lineDate.AddComponent<TextMeshProUGUI>();
             textDate.fontSize = 28;
             textDate.enableWordWrapping = false;
@@ -92,7 +89,8 @@ namespace FrankenToilet.somebilly {
             lineRandom = new GameObject("LineRandom");
             lineRandom.transform.SetParent(layout.transform);
             GoodScaler lineRandomScaler = lineRandom.AddComponent<GoodScaler>();
-            lineRandomScaler.speed = UnityEngine.Random.Range(1.75f, 4f);
+            lineRandomScaler.speed = 0.5f * UnityEngine.Random.Range(2, 10);
+            lineRandomScaler.progress = 4.5f;
             textRandom = lineRandom.AddComponent<TextMeshProUGUI>();
             textRandom.fontSize = 28;
             textRandom.enableWordWrapping = false;
@@ -101,7 +99,8 @@ namespace FrankenToilet.somebilly {
             lineScene = new GameObject("LineScene");
             lineScene.transform.SetParent(layout.transform);
             GoodSwayer lineSceneSwayer = lineScene.AddComponent<GoodSwayer>();
-            lineSceneSwayer.speed = UnityEngine.Random.Range(1.75f, 4f);
+            lineSceneSwayer.speed = 0.5f * UnityEngine.Random.Range(2, 10);
+            lineSceneSwayer.progress = 2f;
             textScene = lineScene.AddComponent<TextMeshProUGUI>();
             textScene.fontSize = 28;
             textScene.enableWordWrapping = false;
@@ -120,7 +119,7 @@ namespace FrankenToilet.somebilly {
         public void UpdateTexts() {
             textWelcome.text = "<b>WELCOME TO FRANKENTOILET. TODAY IS:</b>";
             textDate.text = $"<b>{System.DateTime.Now.ToString("MMMM dd, yyyy")}</b>";
-            textRandom.text = $"<b>Random number: {UnityEngine.Random.Range(0, 1000001)}</b>";
+            textRandom.text = $"<b>Random number: {UnityEngine.Random.Range(0, 100001)}</b>";
             textScene.text = $"<b>Current scene: {SceneHelper.CurrentScene}</b>";
         }
     }
@@ -172,6 +171,7 @@ namespace FrankenToilet.somebilly {
             }
             GameObject info = new GameObject("FrankenInfo");
             info.transform.SetParent(__instance.transform);
+            info.transform.SetSiblingIndex(5);
             info.AddComponent<GoodInfoText>();
         }
     }
@@ -241,6 +241,11 @@ namespace FrankenToilet.somebilly {
 				select obj).First().transform;
 			return canvas;
 		}
+
+        public static string GetCurrentAssemblyPath() {
+            string dllPath = Assembly.GetExecutingAssembly().Location;
+            return Path.GetDirectoryName(dllPath);
+        }
 
 
         public static Texture2D LoadEmbeddedTexture(string resourceName) {
@@ -374,7 +379,7 @@ namespace FrankenToilet.somebilly {
             AudioSource audio = voiceObject.AddComponent<AudioSource>();
             audio.clip = voice;
             audio.volume = volume;
-            audio.PlayDelayed(UnityEngine.Random.Range(0.0f, 0.1f));
+            audio.PlayDelayed(UnityEngine.Random.Range(0.0f, 0.2f));
 
             StartCoroutine(WaitAndMute(audio));
         }
@@ -395,10 +400,12 @@ namespace FrankenToilet.somebilly {
         }
 
         public static IEnumerator WaitAndMute(AudioSource audio) {
-            while (audio.isPlaying) {
+            while (audio && audio.isPlaying) {
                 yield return null;
             }
-            audio.mute = true;
+            if (audio) {
+                audio.mute = true;
+            }
         }
 
 
@@ -430,7 +437,55 @@ namespace FrankenToilet.somebilly {
 
             confettiObject.AddComponent<RemoveAfter>();
             ConfettiFall fall = confettiObject.AddComponent<ConfettiFall>();
-            fall.speed = Screen.height;
+            fall.speed = UnityEngine.Random.Range(0.75f, 1.25f) * Screen.height;
+        }
+
+
+        // THIS IS THE TWO.
+        public static void SpawnTwo() {
+            string videoPath = Path.Combine(Bib.GetCurrentAssemblyPath(), "2.mp4");
+            if (!File.Exists(videoPath)) {
+                LogHelper.LogError("2.mp4 not found");
+                return;
+            }
+            float twoSpawnDistance = 300f;
+            float twoSpawnHeight = 500f;
+
+            GameObject billboard = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            billboard.name = "FrankenTwo";
+            billboard.transform.localScale = new Vector3(60, 60, 60);
+
+            RenderTexture videoTexture = new RenderTexture(374, 210, 16);
+            videoTexture.Create();
+            
+            VideoPlayer video = billboard.AddComponent<VideoPlayer>();
+            video.url = videoPath;
+            video.targetTexture = videoTexture;
+            video.isLooping = true;
+            video.playOnAwake = true;
+            
+            Material mat = new Material(Shader.Find("Unlit/Texture"));
+            mat.color = new Color(1, 1, 1, 1);
+            mat.mainTexture = videoTexture;
+            MeshRenderer renderer = billboard.GetComponent<MeshRenderer>();
+            renderer.material = mat;
+
+            AlwaysLookAtCamera looker = billboard.AddComponent<AlwaysLookAtCamera>();
+            looker.rotationOffset = new Vector3(180, 0, 180);
+            UnityObject.Destroy(billboard.GetComponent<MeshCollider>());
+            billboard.transform.position = new Vector3(0, twoSpawnHeight, 0) + GetPointOnCircle(NewMovement.Instance.transform.position, twoSpawnDistance);
+
+            billboard.AddComponent<TwoFaller>();
+        }
+
+        public static Vector3 GetPointOnCircle(Vector3 center, float radius) {
+            float angleDeg = UnityEngine.Random.Range(0, 360);
+            float angleRad = angleDeg * Mathf.Deg2Rad;
+            return new Vector3(
+                center.x + radius * Mathf.Cos(angleRad),
+                center.y,
+                center.z + radius * Mathf.Sin(angleRad)
+            );
         }
     }
 
@@ -477,14 +532,61 @@ namespace FrankenToilet.somebilly {
     // --------------------
     [PatchOnEntry]
     [HarmonyPatch]
-    public static class VoiceV1Patch {
+    public static class V1Patch {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(NewMovement), "Start")]
-        public static void Postfix(NewMovement __instance) {
+        public static void StartPostfix(NewMovement __instance) {
+            string[] TwoScenes = {"Level 2-1", "Level 2-2", "Level 2-3", "Level 2-4"};
+            if (TwoScenes.Contains(SceneHelper.CurrentScene)) {
+                __instance.gameObject.AddComponent<TwoSpawner>();
+            }
+
             if (SceneHelper.CurrentScene == "Level 2-S") {
                 return;
             }
             Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceV1);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(NewMovement), "Update")]
+        public static void UpdatePostfix(NewMovement __instance) {
+            if (SceneHelper.CurrentScene == "Level 2-S") {
+                return;
+            }
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceV1);
+        }
+    }
+
+    public class TwoSpawner : MonoBehaviour {
+        public float time = 1.25f;
+        public float currentTime = 0f;
+
+        void Update() {
+            currentTime += Time.deltaTime;
+            if (currentTime >= time) {
+                currentTime = 0f;
+                Bib.SpawnTwo();
+            }
+        }
+    }
+
+    public class TwoFaller : MonoBehaviour {
+        public float speed;
+        public float fallenDistance = 0f;
+        public float maxFallenDistance = 1500f;
+
+        void Awake() {
+            speed = UnityEngine.Random.Range(30, 90);
+        }
+
+        void Update() {
+            float fallDistance = speed * Time.deltaTime;
+            Vector3 pos = this.transform.position;
+            this.transform.position = new Vector3(pos.x, pos.y - fallDistance, pos.z);
+            fallenDistance += fallDistance;
+            if (fallenDistance >= maxFallenDistance) {
+                UnityObject.Destroy(this.gameObject);
+            }
         }
     }
 
@@ -777,7 +879,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Ferryman), "Start")]
         public static void Postfix(Ferryman __instance) {
-            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceFerryman);
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceFerryman, 0.75f);
         }
     }
 
@@ -801,7 +903,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(StatueBoss), "Start")]
         public static void Postfix(StatueBoss __instance) {
-            if (SceneHelper.CurrentScene == "Level 0-5" || (SceneHelper.CurrentScene == "Level 7-1" && __instance.transform.root.Find("4 - Interior Exterior") != null)) {
+            if (SceneHelper.CurrentScene == "Level 0-5" || (SceneHelper.CurrentScene == "Level 7-1" && __instance.transform.parent.name == "Awakened")) {
                 Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceCerberusBig);
                 return;
             }
@@ -859,7 +961,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(LeviathanHead), "Start")]
         public static void Postfix(LeviathanHead __instance) {
-            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceLeviathan);
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceLeviathan, 0.85f);
         }
     }
 
@@ -889,7 +991,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Minotaur), "Start")]
         public static void Postfix(Minotaur __instance) {
-            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceMinotaur);
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceMinotaur, 0.85f);
         }
     }
 
@@ -913,7 +1015,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GabrielSecond), "Start")]
         public static void Postfix(GabrielSecond __instance) {
-            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceGagabriel);
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceGagabriel, 0.85f);
         }
     }
 
@@ -978,7 +1080,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MinosPrime), "Start")]
         public static void Postfix(MinosPrime __instance) {
-            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceMinosPrime);
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceMinosPrime, 0.85f);
         }
     }
 
@@ -988,7 +1090,7 @@ namespace FrankenToilet.somebilly {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SisyphusPrime), "Start")]
         public static void Postfix(SisyphusPrime __instance) {
-            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceSisyphusPrime);
+            Plugin.bib.AddAndPlayVoice(__instance.gameObject, Bib.VoiceSisyphusPrime, 0.85f);
         }
     }
 
