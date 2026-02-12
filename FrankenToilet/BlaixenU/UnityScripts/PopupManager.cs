@@ -5,18 +5,20 @@ using UnityEngine.UI;
 
 namespace FrankenToilet.BlaixenU.UnityScripts;
 
-public class PopupMan : MonoSingleton<PopupMan>
+public class PopupManager : MonoBehaviour
 {
+    private GameObject popupObject;
+
     private float timeOfLastPopup;
 
-    public float TimeSincePopup => timeOfLastPopup - Time.realtimeSinceStartup;
+    public float TimeSincePopup => Time.realtimeSinceStartup - timeOfLastPopup;
 
     private void Update()
     {
         if (TimeSincePopup > 5)
         {
-            Popup();
             timeOfLastPopup = Time.realtimeSinceStartup;
+            Popup();
         }
     }
 
@@ -25,14 +27,36 @@ public class PopupMan : MonoSingleton<PopupMan>
         switch (Random.Range(1, 3))
         {
             case 1:
-            Instantiate(AssetMan.Popup1);
+            popupObject = Instantiate(AssetMan.Popup1);
             break;
             case 2:
-            Instantiate(AssetMan.Popup2);
+            popupObject = Instantiate(AssetMan.Popup2);
             break;
             case 3:
-            Instantiate(AssetMan.Popup3);
+            popupObject = Instantiate(AssetMan.Popup3);
             break;
         }
+        var popupTrans = popupObject.transform;
+        popupTrans.SetParent(UnityPathHelper.FindCanvas().transform);
+        var rectTrans = popupObject.GetComponent<RectTransform>();
+        
+        rectTrans.SetPositionAndRotation(new Vector3(900 + Random.Range(-500, 500), 400 + Random.Range(-200, 200), 0), rectTrans.rotation);
+
+        rectTrans.SetAsLastSibling();
+    }
+}
+
+public static class UnityPathHelper
+{
+    public static Canvas FindCanvas()
+    {
+        var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            var canvas = root.GetComponent<Canvas>();
+            if (canvas != null)
+                return canvas;
+        }
+        return null;
     }
 }
