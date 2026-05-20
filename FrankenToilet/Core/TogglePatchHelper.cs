@@ -1,5 +1,4 @@
 ﻿using BepInEx.Configuration;
-using FrankenToilet.triggeredidiot;
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
