@@ -5,8 +5,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 
 /// <summary> Patch the silly lil style hud :3 </summary>
-[PatchOnEntry]
-[HarmonyPatch(typeof(StyleHUD))]
+[PatchOnEntry] [HarmonyPatch(typeof(StyleHUD))]
 public static class StyleHUDPatch
 {
     /// <summary> Goofed style ranks :3 </summary>
@@ -39,8 +38,7 @@ public static class StyleHUDPatch
     };
 
     /// <summary> use my style edits first 3:< </summary>
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(StyleHUD), "GetLocalizedName")]
+    [HarmonyPrefix] [HarmonyPatch(typeof(StyleHUD), "GetLocalizedName")]
     public static bool USEMINEGRRR(string id, ref string __result)
     {
         if (styleEdits.TryGetValue(id, out var replacement))

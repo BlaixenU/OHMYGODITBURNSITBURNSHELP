@@ -1,4 +1,4 @@
-#pragma warning disable CS8618
+﻿#pragma warning disable CS8618
 using UnityEngine;
 using UnityEngine.Video;
 using UnityObject = UnityEngine.Object;
@@ -39,7 +39,7 @@ namespace FrankenToilet.somebilly {
             billboard.transform.position = GetPointOnCircle(NewMovement.Instance.transform.position, Two.twoSpawnDistance, Two.twoSpawnHeight);
 
             billboard.AddComponent<TwoFaller>();
-            billboard.AddComponent<FrankenToilet.Bryan.Patches.NonReplaceableVideo>();
+            billboard.AddComponent<FrankenToilet.Bryan.NonReplaceableVideo>();
         }
 
         public static Vector3 GetPointOnCircle(Vector3 center, float radius, float heightOffset) {

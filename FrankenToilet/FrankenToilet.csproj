@@ -24,13 +24,14 @@
 
   <Import Project="Properties/DeployToPlugins.targets" />
   <Import Project="Properties/DevMode.targets" />
-  <!--<ItemGroup>
+  <ItemGroup>
     <Compile Remove="alma\**" />
     <Compile Remove="Bananastudio\**" />
     <Compile Remove="BlaixenU\**" />
     <Compile Remove="bobthecorn\**" />
     <Compile Remove="dolfelive\**" />
     <Compile Remove="doomahreal\**" />
+    <Compile Remove="Heavyreal\**" />
     <Compile Remove="duviz\**" />
     <Compile Remove="earthling\**" />
     <Compile Remove="flazhik\**" />
@@ -47,6 +48,7 @@
     <EmbeddedResource Remove="bobthecorn\**" />
     <EmbeddedResource Remove="dolfelive\**" />
     <EmbeddedResource Remove="doomahreal\**" />
+    <EmbeddedResource Remove="Heavyreal\**" />
     <EmbeddedResource Remove="duviz\**" />
     <EmbeddedResource Remove="earthling\**" />
     <EmbeddedResource Remove="flazhik\**" />
@@ -63,6 +65,7 @@
     <None Remove="bobthecorn\**" />
     <None Remove="dolfelive\**" />
     <None Remove="doomahreal\**" />
+    <None Remove="Heavyreal\**" />
     <None Remove="duviz\**" />
     <None Remove="earthling\**" />
     <None Remove="flazhik\**" />
@@ -73,7 +76,7 @@
     <None Remove="prideunique\**" />
     <None Remove="somebilly\**" />
     <None Remove="triggeredidiot\**" />
-  </ItemGroup>-->
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />

@@ -5,19 +5,17 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 
-[PatchOnEntry]
-[HarmonyPatch(typeof(LaughingSkull))]
+[PatchOnEntry] [HarmonyPatch(typeof(LaughingSkull))]
 public static class DeathScreenPatch
 {
-    [HarmonyPostfix]
-    [HarmonyPatch("Start")]
+    [HarmonyPostfix] [HarmonyPatch("Start")]
     public static void oiweoufjds(LaughingSkull __instance)
     {
-        __instance.GetComponent<Animator>().runtimeAnimatorController = BundleLoader.BadLaughingSkullAnim;
+        __instance.GetComponent<Animator>().runtimeAnimatorController = Assets.LaughingAnim;
         __instance.gameObject.AddComponent<LaughLaugh>();
 
         var blackScreen = __instance.transform.parent.GetComponent<Image>();
-        blackScreen.sprite = BundleLoader.Trans;
+        blackScreen.sprite = Assets.Trans;
     }
 }
 
@@ -40,7 +38,7 @@ public class LaughLaugh : MonoBehaviour
         Skull = GetComponent<Image>();
 
         Aud = GetComponent<AudioSource>();
-        Aud.clip = BundleLoader.BadLaughing;
+        Aud.clip = Assets.Laughing;
         Aud.loop = true;
     }
 
