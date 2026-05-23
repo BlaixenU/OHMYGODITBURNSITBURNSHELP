@@ -30,7 +30,7 @@ public class TurnDarkOverTime : MonoSingleton<TurnDarkOverTime>
                     return;
                 
                 var canvas = go.GetComponentInChildren<Canvas>();
-                canvas.sortingOrder = 9999; // The "LOADING" screen's sorting order is 1000
+                canvas.sortingOrder = 1114; // The "LOADING" screen's sorting order is 1000
 
                 rawImage = go.GetComponentInChildren<RawImage>();
                 if (!rawImage)
