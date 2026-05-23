@@ -14,10 +14,7 @@ public class TurnDarkOverTime : MonoSingleton<TurnDarkOverTime>
     private float elapsed = 0f;
     private bool fading = false;
 
-    public void Awake()
-    {
-        gameObject.hideFlags = HideFlags.HideAndDontSave;
-    }
+    public void Awake() {}
 
     public void Update()
     {
@@ -27,11 +24,13 @@ public class TurnDarkOverTime : MonoSingleton<TurnDarkOverTime>
             {
                 CreatedCanvas = true;
 
-                GameObject go = AssetsController.LoadAsset<GameObject>("assets/aizoaizo/darkovertime.prefab");
-                go.hideFlags = HideFlags.HideAndDontSave;
-
+                GameObject go = Object.Instantiate(AssetsController.LoadAsset<GameObject>("assets/aizoaizo/darkovertime.prefab"));
+                Object.DontDestroyOnLoad(go);
                 if (!go)
                     return;
+                
+                var canvas = go.GetComponentInChildren<Canvas>();
+                canvas.sortingOrder = 9999; // The "LOADING" screen's sorting order is 1000
 
                 rawImage = go.GetComponentInChildren<RawImage>();
                 if (!rawImage)
@@ -78,5 +77,3 @@ public class TurnDarkOverTime : MonoSingleton<TurnDarkOverTime>
         rawImage.color = c;
     }
 }
-
-
