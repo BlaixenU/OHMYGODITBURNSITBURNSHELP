@@ -14,7 +14,10 @@ public class TurnDarkOverTime : MonoSingleton<TurnDarkOverTime>
     private float elapsed = 0f;
     private bool fading = false;
 
-    public void Awake() {}
+    public void Awake()
+    {
+        gameObject.hideFlags = HideFlags.HideAndDontSave;
+    }
 
     public void Update()
     {

@@ -1,10 +1,11 @@
-﻿using FrankenToilet.duviz;
+﻿using FrankenToilet.Core;
+using FrankenToilet.duviz;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace FrankenToilet.Core;
+namespace FrankenToilet.duviz.events;
 
 /// <summary> You can see an example of an event in the EventsCreator.cs </summary>
 public class EventsManager : MonoBehaviour

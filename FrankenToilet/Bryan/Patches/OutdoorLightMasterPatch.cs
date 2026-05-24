@@ -5,13 +5,11 @@ using HarmonyLib;
 using UnityEngine;
 
 /// <summary> Assigns outdoors light colors for 2-1. </summary>
-[PatchOnEntry]
-[HarmonyPatch(typeof(OutdoorLightMaster))]
+[PatchOnEntry] [HarmonyPatch(typeof(OutdoorLightMaster))]
 public static class OutdoorLightMasterPatch
 {
     /// <summary> assign colors cuz they look cool :3 </summary>
-    [HarmonyPostfix]
-    [HarmonyPatch("Start")]
+    [HarmonyPostfix] [HarmonyPatch("Start")]
     public static void raaaaaaawruwu(OutdoorLightMaster __instance)
     {
         if (SceneHelper.CurrentScene == "Level 2-1")

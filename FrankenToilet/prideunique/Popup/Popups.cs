@@ -1,4 +1,4 @@
-﻿using FrankenToilet.Bryan.Patches;
+﻿using FrankenToilet.Bryan;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,7 +24,7 @@ public static class Popups
         if (!CameraController.Instance || !OptionsMenuToManager.Instance)
             return;
 
-        PopupCloser.Instance.Awake();
+        _ = PopupCloser.Instance;
 
         MainPrefab = AssetsController.LoadAsset<GameObject>("assets/aizoaizo/popup.prefab");
         GameObject videoPlayer = MainPrefab.GetComponentInChildren<VideoPlayer>().gameObject;

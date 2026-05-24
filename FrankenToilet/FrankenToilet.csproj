@@ -135,4 +135,3 @@
     <Copy SourceFiles="@(MonoModILHelpersDll)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>
 </Project>
-
