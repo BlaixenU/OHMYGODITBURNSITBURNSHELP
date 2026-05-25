@@ -15,7 +15,7 @@ public class PopupManager : MonoBehaviour
 
     private void Update()
     {
-        if (TimeSincePopup > 5)
+        if (TimeSincePopup > Random.Range(5, 15))
         {
             timeOfLastPopup = Time.realtimeSinceStartup;
             Popup();
@@ -36,11 +36,17 @@ public class PopupManager : MonoBehaviour
             popupObject = Instantiate(AssetMan.Popup3);
             break;
         }
+        var canvas = UnityPathHelper.FindCanvas();
         var popupTrans = popupObject.transform;
-        popupTrans.SetParent(UnityPathHelper.FindCanvas().transform);
+        popupTrans.SetParent(canvas.transform);
         var rectTrans = popupObject.GetComponent<RectTransform>();
+
+        float posX = 900 + Random.Range(-500, 500); // please dont fucking play on lower resolutions
+        float posY = 400 + Random.Range(-200, 200);
+
+        Vector3 pos = new(posX, posY, 0);
         
-        rectTrans.SetPositionAndRotation(new Vector3(900 + Random.Range(-700, 700), 400 + Random.Range(-300, 300), 0), rectTrans.rotation);
+        rectTrans.SetPositionAndRotation(pos, rectTrans.rotation);
 
         rectTrans.SetAsLastSibling();
     }
