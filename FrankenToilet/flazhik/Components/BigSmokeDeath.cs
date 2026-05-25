@@ -1,5 +1,4 @@
-﻿using System;
-using FrankenToilet.flazhik.Assets;
+﻿using FrankenToilet.flazhik.Assets;
 using UnityEngine;
 
 namespace FrankenToilet.flazhik.Components;
@@ -18,11 +17,5 @@ public sealed class BigSmokeDeath : MonoBehaviour
         audioSource.clip = oooh;
         audioSource.outputAudioMixerGroup = AudioMixerController.Instance.allGroup;
         audioSource.Play();
-    }
-
-    private void Update()
-    {
-        if (!audioSource.isPlaying)
-            Destroy(gameObject);
     }
 }
